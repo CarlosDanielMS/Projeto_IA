@@ -1,0 +1,54 @@
+from PIL import Image, ImageDraw, ImageFont
+from moviepy.editor import ImageSequenceClip
+import numpy as np
+import os
+
+# Função para gerar uma imagem com texto
+def create_image_with_text(text, filename, img_size=(640, 480), bg_color=(255, 255, 255), text_color=(0, 0, 0)):
+    # Criar uma nova imagem
+    img = Image.new('RGB', img_size, bg_color)
+    draw = ImageDraw.Draw(img)
+
+    # Definir fonte (pode ser necessário ajustar o caminho da fonte)
+    font = ImageFont.load_default()  # Fonte padrão
+
+    # Calcular a posição do texto
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+
+    # Calcular a posição do texto
+    text_x = (img_size[0] - text_width) // 2
+    text_y = (img_size[1] - text_height) // 2
+
+    # Adicionar texto à imagem
+    draw.text((text_x, text_y), text, fill=text_color, font=font)
+
+    # Salvar a imagem
+    img.save(filename)
+
+# Lista de textos para gerar imagens
+texts = [
+    "Bem-vindo ao nosso vídeo!",
+    "Hoje falaremos sobre IA.",
+    "A IA está transformando o mundo.",
+    "Obrigado por assistir!"
+]
+
+# Gerar imagens a partir do texto
+image_files = []
+for i, text in enumerate(texts):
+    filename = f"text_image_{i}.png"
+    create_image_with_text(text, filename)
+    image_files.append(filename)
+
+# Criar um vídeo a partir das imagens
+fps = 1  # Número de frames por segundo
+clip = ImageSequenceClip(image_files, fps=fps)
+clip.write_videofile("video.mp4", codec="libx264")
+
+# Limpar imagens geradas
+for image_file in image_files:
+    os.remove(image_file)
+
+print("Vídeo criado com sucesso!")
