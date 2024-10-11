@@ -1,32 +1,36 @@
-//import PIL.Image
-//img = PIL.Image.open(r'/content/Brazilian-Colours-Centauro-II_CIO-2048x1367-1.webp')
-//img
-
-!pip install transformers
-!pip install pillow
-!pip install googletrans==4.0.0-rc1
+# image_describer.py
 
 import PIL.Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from googletrans import Translator
 
-# Carregar a imagem
-img = PIL.Image.open('/content/Brazilian-Colours-Centauro-II_CIO-2048x1367-1.webp')
+class ImageDescriber:
+    def __init__(self):
+        # Carregar o processador e o modelo
+        self.processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+        self.model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+        self.translator = Translator()
 
-# Carregar o processador e o modelo
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+    def load_image(self, image_path):
+        # Carregar a imagem
+        return PIL.Image.open(image_path)
 
-# Preparar a imagem
-inputs = processor(images=img, return_tensors="pt")
+    def generate_description(self, img):
+        # Preparar a imagem
+        inputs = self.processor(images=img, return_tensors="pt")
 
-# Gerar a descrição
-out = model.generate(**inputs, max_length=50)  # Ajuste max_length conforme necessário
-description = processor.decode(out[0], skip_special_tokens=True)
+        # Gerar a descrição
+        out = self.model.generate(**inputs, max_length=50)  # Ajuste max_length conforme necessário
+        description = self.processor.decode(out[0], skip_special_tokens=True)
+        return description
 
-# Traduzir para o português
-translator = Translator()
-translated_description = translator.translate(description, dest='pt').text
+    def translate_description(self, description):
+        # Traduzir para o português
+        return self.translator.translate(description, dest='pt').text
 
-# Exibir a descrição em português
-print(translated_description)
+    def process_image(self, image_path):
+        # Processar a imagem para gerar e traduzir a descrição
+        img = self.load_image(image_path)
+        description = self.generate_description(img)
+        translated_description = self.translate_description(description)
+        return translated_description
