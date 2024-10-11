@@ -1,0 +1,27 @@
+# Instalar as bibliotecas necessárias
+!pip install diffusers[torch] transformers scipy
+!pip install accelerate
+!pip install pillow
+
+import torch
+from diffusers import StableDiffusionPipeline
+from PIL import Image
+
+# Carregar o modelo Stable Diffusion
+# Usar o modelo em precisão de ponto flutuante 16 para melhor desempenho na GPU
+pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
+pipe = pipe.to("cuda")  # Mova o modelo para a GPU se disponível
+
+# Defina seu prompt
+prompt = "Uma paisagem futurista com montanhas e um pôr do sol e um avião passando pelos céus"
+
+# Gerar a imagem
+with torch.no_grad():
+    image = pipe(prompt, num_inference_steps=50).images[0]  # Ajuste num_inference_steps conforme necessário
+
+# Salvar a imagem gerada
+image.save("imagem_gerada.png")
+
+# Exibir a imagem gerada
+img = Image.open("imagem_gerada.png")
+img.show()
