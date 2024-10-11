@@ -1,27 +1,34 @@
-# Instalar as bibliotecas necessárias
-!pip install diffusers[torch] transformers scipy
-!pip install accelerate
-!pip install pillow
+# image_generator.py
 
 import torch
 from diffusers import StableDiffusionPipeline
 from PIL import Image
 
-# Carregar o modelo Stable Diffusion
-# Usar o modelo em precisão de ponto flutuante 16 para melhor desempenho na GPU
-pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
-pipe = pipe.to("cuda")  # Mova o modelo para a GPU se disponível
+class ImageGenerator:
+    def __init__(self):
+        # Carregar o modelo Stable Diffusion em precisão de ponto flutuante 16
+        self.pipe = StableDiffusionPipeline.from_pretrained(
+            "CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16
+        )
+        self.pipe = self.pipe.to("cuda")  # Mova o modelo para a GPU se disponível
 
-# Defina seu prompt
-prompt = "Uma paisagem futurista com montanhas e um pôr do sol e um avião passando pelos céus"
+    def generate_image(self, prompt, num_inference_steps=50):
+        # Gerar a imagem
+        with torch.no_grad():
+            image = self.pipe(prompt, num_inference_steps=num_inference_steps).images[0]
+        return image
 
-# Gerar a imagem
-with torch.no_grad():
-    image = pipe(prompt, num_inference_steps=50).images[0]  # Ajuste num_inference_steps conforme necessário
+    def save_image(self, image, filename="imagem_gerada.png"):
+        # Salvar a imagem gerada
+        image.save(filename)
 
-# Salvar a imagem gerada
-image.save("imagem_gerada.png")
+    def show_image(self, filename="imagem_gerada.png"):
+        # Exibir a imagem gerada
+        img = Image.open(filename)
+        img.show()
 
-# Exibir a imagem gerada
-img = Image.open("imagem_gerada.png")
-img.show()
+    def process_image(self, prompt):
+        # Processar a imagem com base no prompt
+        generated_image = self.generate_image(prompt)
+        self.save_image(generated_image)
+        self.show_image()
