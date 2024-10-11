@@ -1,54 +1,58 @@
+# video_generator.py
+
 from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import ImageSequenceClip
-import numpy as np
 import os
 
-# Função para gerar uma imagem com texto
-def create_image_with_text(text, filename, img_size=(640, 480), bg_color=(255, 255, 255), text_color=(0, 0, 0)):
-    # Criar uma nova imagem
-    img = Image.new('RGB', img_size, bg_color)
-    draw = ImageDraw.Draw(img)
+class VideoGenerator:
+    def __init__(self, img_size=(640, 480), bg_color=(255, 255, 255), text_color=(0, 0, 0)):
+        self.img_size = img_size
+        self.bg_color = bg_color
+        self.text_color = text_color
+        self.image_files = []
 
-    # Definir fonte (pode ser necessário ajustar o caminho da fonte)
-    font = ImageFont.load_default()  # Fonte padrão
+    def create_image_with_text(self, text, filename):
+        # Criar uma nova imagem
+        img = Image.new('RGB', self.img_size, self.bg_color)
+        draw = ImageDraw.Draw(img)
 
-    # Calcular a posição do texto
-    text_bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
+        # Definir fonte (pode ser necessário ajustar o caminho da fonte)
+        font = ImageFont.load_default()  # Fonte padrão
 
-    # Calcular a posição do texto
-    text_x = (img_size[0] - text_width) // 2
-    text_y = (img_size[1] - text_height) // 2
+        # Calcular a posição do texto
+        text_bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
 
-    # Adicionar texto à imagem
-    draw.text((text_x, text_y), text, fill=text_color, font=font)
+        # Calcular a posição do texto
+        text_x = (self.img_size[0] - text_width) // 2
+        text_y = (self.img_size[1] - text_height) // 2
 
-    # Salvar a imagem
-    img.save(filename)
+        # Adicionar texto à imagem
+        draw.text((text_x, text_y), text, fill=self.text_color, font=font)
 
-# Lista de textos para gerar imagens
-texts = [
-    "Bem-vindo ao nosso vídeo!",
-    "Hoje falaremos sobre IA.",
-    "A IA está transformando o mundo.",
-    "Obrigado por assistir!"
-]
+        # Salvar a imagem
+        img.save(filename)
 
-# Gerar imagens a partir do texto
-image_files = []
-for i, text in enumerate(texts):
-    filename = f"text_image_{i}.png"
-    create_image_with_text(text, filename)
-    image_files.append(filename)
+    def generate_images(self, texts):
+        # Gerar imagens a partir do texto
+        for i, text in enumerate(texts):
+            filename = f"text_image_{i}.png"
+            self.create_image_with_text(text, filename)
+            self.image_files.append(filename)
 
-# Criar um vídeo a partir das imagens
-fps = 1  # Número de frames por segundo
-clip = ImageSequenceClip(image_files, fps=fps)
-clip.write_videofile("video.mp4", codec="libx264")
+    def create_video(self, video_filename, fps=1):
+        # Criar um vídeo a partir das imagens
+        clip = ImageSequenceClip(self.image_files, fps=fps)
+        clip.write_videofile(video_filename, codec="libx264")
 
-# Limpar imagens geradas
-for image_file in image_files:
-    os.remove(image_file)
+    def clean_up(self):
+        # Limpar imagens geradas
+        for image_file in self.image_files:
+            os.remove(image_file)
+        self.image_files.clear()
 
-print("Vídeo criado com sucesso!")
+    def process_video(self, texts, video_filename, fps=1):
+        self.generate_images(texts)
+        self.create_video(video_filename, fps)
+        self.clean_up()
