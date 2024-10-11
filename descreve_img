@@ -1,0 +1,32 @@
+//import PIL.Image
+//img = PIL.Image.open(r'/content/Brazilian-Colours-Centauro-II_CIO-2048x1367-1.webp')
+//img
+
+!pip install transformers
+!pip install pillow
+!pip install googletrans==4.0.0-rc1
+
+import PIL.Image
+from transformers import BlipProcessor, BlipForConditionalGeneration
+from googletrans import Translator
+
+# Carregar a imagem
+img = PIL.Image.open('/content/Brazilian-Colours-Centauro-II_CIO-2048x1367-1.webp')
+
+# Carregar o processador e o modelo
+processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+
+# Preparar a imagem
+inputs = processor(images=img, return_tensors="pt")
+
+# Gerar a descrição
+out = model.generate(**inputs, max_length=50)  # Ajuste max_length conforme necessário
+description = processor.decode(out[0], skip_special_tokens=True)
+
+# Traduzir para o português
+translator = Translator()
+translated_description = translator.translate(description, dest='pt').text
+
+# Exibir a descrição em português
+print(translated_description)
