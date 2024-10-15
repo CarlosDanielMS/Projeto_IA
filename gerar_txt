@@ -1,8 +1,0 @@
-import google.generativeai as genai
-
-API_KEY = "AIzaSyCJQXgoOd3DBBnXGkV0BVZbklo6jrjnsaQ"
-
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-pro')
-response = model.generate_content('Por que não vemos estrelas de dia?')
-print(response.text)
