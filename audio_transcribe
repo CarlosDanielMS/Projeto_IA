@@ -1,0 +1,38 @@
+import google.generativeai as genai
+
+# Configure sua chave de API
+my_api_key = 'chave-API'  # Substitua pela sua chave de API
+genai.configure(api_key=my_api_key)
+
+# Função para enviar o áudio e obter a transcrição
+def transcribe_audio(audio_file_path):
+    # Fazer o upload do arquivo de áudio
+    audio_file = genai.upload_file(path=audio_file_path)
+
+    # Inicializar o modelo Gemini
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+
+    # Criar o prompt para transcrição
+    prompt = "Transcribe the audio."
+
+    # Passar o prompt e o arquivo de áudio para o modelo Gemini
+    response = model.generate_content([prompt, audio_file])
+
+    # Retornar o texto transcrito
+    return response.text
+
+# Função para abrir a janela de diálogo e selecionar o arquivo de áudio
+def select_audio_file():
+    from tkinter import filedialog
+
+    # Abre a janela de diálogo para seleção de arquivos
+    return filedialog.askopenfilename(title="Selecione um Arquivo de Áudio", 
+                                       filetypes=[("Arquivos de Áudio", "*.mp3;*.wav")])
+# Exemplo de uso
+if __name__ == '__main__':
+    audio_file = select_audio_file()  # Solicita ao usuário que selecione um arquivo de áudio
+    if audio_file:  # Verifica se um arquivo foi selecionado
+        transcribed_text = transcribe_audio(audio_file)
+        print("Texto transcrito:", transcribed_text)
+    else:
+        print("Nenhum arquivo selecionado.")
