@@ -1,5 +1,3 @@
-# image_describer.py
-
 import PIL.Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from googletrans import Translator
@@ -20,7 +18,7 @@ class ImageDescriber:
         inputs = self.processor(images=img, return_tensors="pt")
 
         # Gerar a descrição
-        out = self.model.generate(**inputs, max_length=50)  # Ajuste max_length conforme necessário
+        out = self.model.generate(**inputs, max_length=50)
         description = self.processor.decode(out[0], skip_special_tokens=True)
         return description
 
