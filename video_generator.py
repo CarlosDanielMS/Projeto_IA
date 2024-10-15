@@ -1,5 +1,3 @@
-# video_generator.py
-
 from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import ImageSequenceClip
 import os
@@ -17,18 +15,18 @@ class VideoGenerator:
         draw = ImageDraw.Draw(img)
 
         # Definir fonte (pode ser necessário ajustar o caminho da fonte)
-        font = ImageFont.load_default()  # Fonte padrão
+        font = ImageFont.load_default()
 
         # Calcular a posição do texto
         text_bbox = draw.textbbox((0, 0), text, font=font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
 
-        # Calcular a posição do texto
+        # Centralizar o texto na imagem
         text_x = (self.img_size[0] - text_width) // 2
         text_y = (self.img_size[1] - text_height) // 2
 
-        # Adicionar texto à imagem
+        # Adicionar o texto à imagem
         draw.text((text_x, text_y), text, fill=self.text_color, font=font)
 
         # Salvar a imagem
@@ -47,12 +45,13 @@ class VideoGenerator:
         clip.write_videofile(video_filename, codec="libx264")
 
     def clean_up(self):
-        # Limpar imagens geradas
+        # Limpar as imagens geradas
         for image_file in self.image_files:
             os.remove(image_file)
         self.image_files.clear()
 
     def process_video(self, texts, video_filename, fps=1):
+        # Gerar imagens e vídeo
         self.generate_images(texts)
         self.create_video(video_filename, fps)
         self.clean_up()
