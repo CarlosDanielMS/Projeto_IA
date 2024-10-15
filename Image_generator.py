@@ -1,5 +1,3 @@
-# image_generator.py
-
 import torch
 from diffusers import StableDiffusionPipeline
 from PIL import Image
@@ -10,7 +8,9 @@ class ImageGenerator:
         self.pipe = StableDiffusionPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16
         )
-        self.pipe = self.pipe.to("cuda")  # Mova o modelo para a GPU se disponível
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.pipe = self.pipe.to(device)
+
 
     def generate_image(self, prompt, num_inference_steps=50):
         # Gerar a imagem
