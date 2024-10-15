@@ -1,6 +1,6 @@
 import google.generativeai as genai
 
-API_KEY = "SUA_CHAVE_API"
+API_KEY = "chave-API"
 
 class TextGenerator:
     def __init__(self):
