@@ -8,6 +8,8 @@ Este repositório contém a implementação do algoritmo SARSA para treinar um a
 - **Visualização do Treinamento:** Durante o treinamento, o agente realiza ações no ambiente, que são visualizadas em um GIF animado.
 - **Métricas de Desempenho:** O desempenho do agente é avaliado durante o treinamento, com gráficos que mostram as recompensas e o número de passos por episódio.
 
+Link Colab: https://colab.research.google.com/drive/1pzJUex68u-_YT7OjJwEhNnshkN-gVnbc?usp=sharing
+
 Como Usar
 
     Configuração do Ambiente: O código cria automaticamente o ambiente Taxi-v3 do Gymnasium. Você pode customizar o ambiente conforme necessário.
