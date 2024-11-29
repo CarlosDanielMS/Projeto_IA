@@ -1,4 +1,5 @@
 !pip install gymnasium gymnasium-toy-text moviepy matplotlib -q  # Instalar dependências
+!pip install gymnasium numpy matplotlib moviepy
 
 import gymnasium as gym
 import os
