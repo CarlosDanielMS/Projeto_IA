@@ -1,0 +1,127 @@
+!pip install gymnasium gymnasium-toy-text moviepy matplotlib -q  # Instalar dependências
+
+import gymnasium as gym
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from moviepy.editor import ImageSequenceClip
+
+def create_environment(env_name="Taxi-v3", render_mode="rgb_array"):
+    """Create and return a Gymnasium environment."""
+    return gym.make(env_name, render_mode=render_mode)
+
+def initialize_q_table(env):
+    """Initialize and return a Q-table for the given environment."""
+    n_states = env.observation_space.n
+    n_actions = env.action_space.n
+    return np.zeros((n_states, n_actions))
+
+def epsilon_greedy(env, Q_table, state, epsilon=0.1):
+    """Epsilon-greedy action selection."""
+    if np.random.random() < epsilon:
+        return env.action_space.sample()
+    else:
+        return np.argmax(Q_table[state])
+
+def sarsa_update(Q_table, state, action, reward, next_state, next_action, alpha, gamma):
+    """Perform SARSA update on Q-table."""
+    Q_table[state, action] += alpha * (
+        reward + gamma * Q_table[next_state, next_action] - Q_table[state, action]
+    )
+
+def train_sarsa(env, n_episodes=20000, alpha=0.1, gamma=0.99, epsilon=0.1):
+    """Train the agent using SARSA algorithm."""
+    Q_table = initialize_q_table(env)
+    rewards_per_episode = []
+    steps_per_episode = []
+
+    for episode in range(n_episodes):
+        state, _ = env.reset()
+        action = epsilon_greedy(env, Q_table, state, epsilon)
+        done = False
+        total_reward = 0
+        steps = 0
+        while not done:
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
+            next_action = epsilon_greedy(env, Q_table, next_state, epsilon)
+            sarsa_update(
+                Q_table, state, action, reward, next_state, next_action, alpha, gamma
+            )
+            state = next_state
+            action = next_action
+            total_reward += reward
+            steps += 1
+        
+        # Salvar métricas por episódio
+        rewards_per_episode.append(total_reward)
+        steps_per_episode.append(steps)
+
+    return Q_table, rewards_per_episode, steps_per_episode
+
+def visualize_training(env, Q_table, episodes_to_run=5):
+    """Run multiple episodes and visualize errors and successes."""
+    frames = []
+    for episode in range(episodes_to_run):
+        state, _ = env.reset()
+        done = False
+        episode_frames = [env.render()]
+        while not done:
+            action = epsilon_greedy(env, Q_table, state, epsilon=0)  
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
+            episode_frames.append(env.render())
+            state = next_state
+        frames.extend(episode_frames)
+    return frames
+
+def create_gif(frames, filename, fps=2):
+    """Creates a GIF animation from a list of frames."""
+    clip = ImageSequenceClip(frames, fps=fps)
+    clip.write_gif(filename, fps=fps)
+
+def plot_metrics(rewards_per_episode, steps_per_episode):
+    """Plot rewards and steps over episodes."""
+    plt.figure(figsize=(14, 6))
+
+    # Plot total rewards per episode
+    plt.subplot(1, 2, 1)
+    plt.plot(rewards_per_episode, color="blue")
+    plt.title("Rewards Per Episode")
+    plt.xlabel("Episode")
+    plt.ylabel("Total Reward")
+
+    # Plot steps per episode
+    plt.subplot(1, 2, 2)
+    plt.plot(steps_per_episode, color="red")
+    plt.title("Steps Per Episode")
+    plt.xlabel("Episode")
+    plt.ylabel("Number of Steps")
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    #diretório "images"
+    if not os.path.exists("images"):
+        os.makedirs("images")
+  
+    #criação do ambiente
+    env = create_environment()
+  
+    #treinamento SARSA
+    Q_table, rewards_per_episode, steps_per_episode = train_sarsa(env, n_episodes=20000)
+  
+    #Plotar métricas
+    plot_metrics(rewards_per_episode, steps_per_episode)
+  
+    #visualizar o agente errando e aprendendo
+    frames = visualize_training(env, Q_table, episodes_to_run=5)
+    
+    # Criar GIF com os episódios registrados
+    gif_path = "images/sarsa_training_visualization.gif"
+    create_gif(frames, gif_path, fps=2)
+    
+    # Exibir o GIF
+    from IPython.display import Image
+    display(Image(gif_path))
