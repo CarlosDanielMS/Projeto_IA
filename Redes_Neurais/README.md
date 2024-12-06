@@ -62,6 +62,7 @@ O código foi inteiramente testado no ambiente **Google Colab**, que oferece uma
 1. Copie o código fornecido em um notebook do Google Colab.
 2. Certifique-se de instalar todas as dependências.
 3. Execute o treinamento e visualize os resultados diretamente na plataforma.
+4. link colab: https://colab.research.google.com/drive/1pzJUex68u-_YT7OjJwEhNnshkN-gVnbc?authuser=1#scrollTo=hs7ZjW_dZD2T
 
 ---
 
